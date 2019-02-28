@@ -76,13 +76,33 @@ class TicTacToe {
   grid = [["", "", ""], ["", "", ""], ["", "", ""]];
 
   constructor() {
+    this.playerCase = "player-1";
     this.initUI();
   }
 
   initUI() {
     this.mainContainer = document.createElement("main");
+    this.mainContainer.setAttribute("class", "container");
+    this.mainContainer.addEventListener("click", this.handleClick.bind(this));
+    this.grid.forEach(row => {
+      row.forEach(col => {
+        const squareCase = document.createElement("div");
+        squareCase.setAttribute("class", "square-case");
+        this.mainContainer.appendChild(squareCase);
+      });
+    });
+
     document.body.appendChild(this.mainContainer);
   }
+
+  handleClick(e) {
+    const squareClass = e.target.getAttribute("class");
+    if (squareClass === "square-case") {
+      e.target.classList.add(this.playerCase);
+    }
+  }
+
+  refresh() {}
 
   updateStatus(grid) {
     const winner = GameStatus.complete(grid);

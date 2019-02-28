@@ -1,0 +1,34 @@
+:root {
+  --bg-color: #ccc;
+  --white-color: #fff;
+  --green-color: #0c0;
+  --red-color: #c00;
+  --blue-color: #00c;
+}
+
+body {
+  background-color: var(--bg-color);
+  align-content: center;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 33.33% 33.33% 33.33%;
+  grid-template-rows: 33.33% 33.33% 33.33%;
+  grid-gap: 5px;
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+}
+
+.square-case {
+  background-color: var(--green-color);
+}
+
+.player-1 {
+  background-color: var(--blue-color);
+}
+
+.player-2 {
+  background-color: var(--red-color);
+}
