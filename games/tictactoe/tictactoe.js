@@ -99,6 +99,7 @@ class TicTacToe {
     const squareClass = e.target.getAttribute("class");
     if (squareClass === "square-case") {
       e.target.classList.add(this.playerCase);
+      setTimeout();
     }
   }
 
