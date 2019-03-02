@@ -1,14 +1,15 @@
-const SH1 = "O";
-const SH2 = "X";
+const SH1 = "player";
+const SH2 = "computer";
 const PLAYER = SH1;
-let COMPUTER = PLAYER != SH1 ? SH2 : SH1;
+const COMPUTER = PLAYER === SH1 ? SH2 : SH1;
 
 class GameStatus {
+  // consolidate into one
   static getHorizontal(grid) {
     for (let row = 0; row < 3; row++) {
-      let current = grid[row][0];
-      if (current != "") {
-        if (current === grid[row][1] && current === grid[row][2]) {
+      let currentRow = grid[row][0];
+      if (currentRow != "") {
+        if (currentRow === grid[row][1] && currentRow === grid[row][2]) {
           return [[row, 0], [row, 1], [row, 2]];
         }
       }
@@ -18,9 +19,9 @@ class GameStatus {
 
   static getVertical(grid) {
     for (let col = 0; col < 3; col++) {
-      let current = grid[0][col];
-      if (current != "") {
-        if (current === grid[1][col] && current === grid[2][col]) {
+      let currentCol = grid[0][col];
+      if (currentCol != "") {
+        if (currentCol === grid[1][col] && currentCol === grid[2][col]) {
           return [[0, col], [1, col + 1], [2, col + 2]];
         }
       }
@@ -53,6 +54,7 @@ class GameStatus {
     return tie;
   }
 
+  // this can just return one type
   static complete(grid) {
     const horizontal = this.getHorizontal(grid);
     if (horizontal) {
@@ -71,39 +73,87 @@ class GameStatus {
     }
   }
 }
-
+// keeps game score on localStorage
+// choose different
+// game config, keeps score in localStorage
+// score and time
 class TicTacToe {
-  grid = [["", "", ""], ["", "", ""], ["", "", ""]];
+  state = {
+    gameGrid: [["", "", ""], ["", "", ""], ["", "", ""]],
+    playerClassA: "player-color-a",
+    playerClassB: "player-color-b",
+    playerClass: ""
+  };
+
+  // jquery selector decorator for document.querySelector $ use regexp to ^.#.test(selector) or createElement?
 
   constructor() {
-    this.playerCase = "player-1";
-    this.initUI();
-  }
+    const { gameGrid, playerClassA, playerClassB } = this.state;
+    this.playerId = playerClassA;
+    this.computerId = playerClassB;
 
-  initUI() {
-    this.mainContainer = document.createElement("main");
-    this.mainContainer.setAttribute("class", "container");
-    this.mainContainer.addEventListener("click", this.handleClick.bind(this));
-    this.grid.forEach(row => {
-      row.forEach(col => {
+    this.mainContainer = document.getElementById("game-container");
+    this.choosePlayerModal = document.getElementById("choose-player-modal");
+    this.winnerModal = document.getElementById("winner-modal");
+
+    gameGrid.forEach((row, rowIndex) => {
+      row.forEach((col, colIndex) => {
         const squareCase = document.createElement("div");
         squareCase.setAttribute("class", "square-case");
+        squareCase.setAttribute("data-key", `${rowIndex},${colIndex}`);
         this.mainContainer.appendChild(squareCase);
       });
     });
 
-    document.body.appendChild(this.mainContainer);
+    this.mainContainer.addEventListener("click", this.handleClick.bind(this));
+    this.initGame();
   }
+  initGame() {
+    this.choosePlayerModal.classList.remove("hidden");
+  }
+  // show choose player modal
+  // level of difficulty?
+  // choose player, player is chosen and then class is switch depending on choice
+  // game starts, timer starts while player is playing
 
   handleClick(e) {
-    const squareClass = e.target.getAttribute("class");
+    const target = e.target;
+    const squareClass = target.getAttribute("class");
+    const { gameGrid } = this.state;
+
     if (squareClass === "square-case") {
-      e.target.classList.add(this.playerCase);
-      setTimeout();
+      target.classList.add(this.playerClass);
+      // might be able to fix this with querySelectorAll
+      const pos = target.getAttribute("data-key").split(",");
+      gameGrid[pos[0]][pos[1]] = PLAYER;
+
+      const gameStatus = this.updateStatus(gameGrid);
+      if (!gameStatus) {
+        setTimeout(this.computerPlay.bind(this), 200);
+      } else {
+        console.log(gameStatus);
+      }
     }
   }
 
-  refresh() {}
+  // needs to be smarter
+  computerPlay() {
+    const { gameGrid } = this.state;
+    for (var i = 0; i < gameGrid.length; i++) {
+      const colIndex = gameGrid[i].indexOf("");
+      if (colIndex > -1) {
+        gameGrid[i][colIndex] = COMPUTER;
+        const gameStatus = this.updateStatus(gameGrid);
+        console.log(gameStatus);
+        document
+          .querySelector(`.square-case[data-key="${i},${colIndex}"]`)
+          .setAttribute("class", this.computerCase);
+
+        break;
+      }
+    }
+    this.updateStatus(gameGrid);
+  }
 
   updateStatus(grid) {
     const winner = GameStatus.complete(grid);
@@ -113,10 +163,12 @@ class TicTacToe {
       if (GameStatus.isTie(grid)) {
         return "Game is Tied";
       } else {
-        return "Game continue";
+        return false;
       }
     }
   }
 }
 
-const tictac = new TicTacToe();
+window.onload = function() {
+  const tictac = new TicTacToe();
+};

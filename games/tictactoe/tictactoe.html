@@ -8,6 +8,21 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <aside id="choose-player-modal" class="choose-player modal hidden">
+      <p>Choose color:</p>
+      <input id="player-color-a" type="radio" name="player-color" />
+      <label for="player-color-a" class="player-color-a"></label>
+      <input type="radio" name="player-color" />
+      <label for="player-color-a" class="player-color-a"></label>
+    </aside>
+    <aside id="winner-modal" class="game-over modal hidden">
+      <p class="winner"></p>
+      <button class="play-again">Play again?</button>
+    </aside>
+    <main id="container">
+      <section id="score"></section>
+      <section id="game-container"></section>
+    </main>
     <script src="./tictactoe.js"></script>
   </body>
 </html>
