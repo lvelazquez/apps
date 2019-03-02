@@ -13,6 +13,8 @@
 body {
   background-color: var(--bg-color);
   align-content: center;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
 }
 
 .modal {
@@ -40,8 +42,6 @@ body {
 
 .choose-player {
   > p {
-    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-      "Lucida Sans", Arial, sans-serif;
     color: var(--white-color);
   }
   > ul {
@@ -57,21 +57,14 @@ body {
   }
 }
 
-.square-case {
+.tile {
   background-color: var(--green-color);
+  cursor: pointer;
 }
 
 .player-color-b {
   background-color: var(--blue-color);
 }
 .player-color-a {
-  background-color: var(--red-color);
-}
-
-.player-1 {
-  background-color: var(--blue-color);
-}
-
-.player-2 {
   background-color: var(--red-color);
 }
