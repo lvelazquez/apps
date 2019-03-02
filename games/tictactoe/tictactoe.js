@@ -108,13 +108,26 @@ class TicTacToe {
     this.mainContainer.addEventListener("click", this.handleClick.bind(this));
     this.initGame();
   }
+
+  // TODO add level of difficulty?
+  // game starts, timer starts while player is playing
   initGame() {
+    this.choosePlayerList = document.querySelectorAll(
+      ".modal .choose-player-list > li"
+    );
+    Array.from(this.choosePlayerList).forEach(option => {
+      option.addEventListener("click", e => {
+        e.preventDefault();
+        this.playerId = e.target.getAttribute("class");
+        this.computerId =
+          this.playerId === this.state.playerClassA
+            ? this.state.playerClassB
+            : this.state.playerClassA;
+        this.choosePlayerModal.classList.add("hidden");
+      });
+    });
     this.choosePlayerModal.classList.remove("hidden");
   }
-  // show choose player modal
-  // level of difficulty?
-  // choose player, player is chosen and then class is switch depending on choice
-  // game starts, timer starts while player is playing
 
   handleClick(e) {
     const target = e.target;
@@ -122,7 +135,7 @@ class TicTacToe {
     const { gameGrid } = this.state;
 
     if (squareClass === "square-case") {
-      target.classList.add(this.playerClass);
+      target.classList.add(this.playerId);
       // might be able to fix this with querySelectorAll
       const pos = target.getAttribute("data-key").split(",");
       gameGrid[pos[0]][pos[1]] = PLAYER;
@@ -144,10 +157,9 @@ class TicTacToe {
       if (colIndex > -1) {
         gameGrid[i][colIndex] = COMPUTER;
         const gameStatus = this.updateStatus(gameGrid);
-        console.log(gameStatus);
         document
           .querySelector(`.square-case[data-key="${i},${colIndex}"]`)
-          .setAttribute("class", this.computerCase);
+          .classList.add(this.computerId);
 
         break;
       }
@@ -170,5 +182,5 @@ class TicTacToe {
 }
 
 window.onload = function() {
-  const tictac = new TicTacToe();
+  tictac = new TicTacToe();
 };
