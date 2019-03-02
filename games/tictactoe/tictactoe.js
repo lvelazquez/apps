@@ -111,7 +111,7 @@ class TicTacToe {
         winner === PLAYER_ID ? "You Win!" : "Computer Wins!";
       this.winnerModal.classList.remove("hidden");
       return true;
-    } else if (this.isTie()) {
+    } else if (playMoves === 6 && this.isTie()) {
       document.querySelector(".winner-text").innerHTML = "Game is Tied!";
       this.winnerModal.classList.remove("hidden");
       return true;
@@ -152,9 +152,7 @@ class TicTacToe {
     var tie = false;
     for (let i = 0; i < this.state.gameGrid.length; i++) {
       tie = this.state.gameGrid[i].every(sq => sq !== "");
-      if (!tie) {
-        return false;
-      }
+      if (!tie) return false;
     }
     return tie;
   }
