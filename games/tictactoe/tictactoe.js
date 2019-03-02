@@ -99,10 +99,13 @@ class TicTacToe {
     const result = this.getStatus(gameGrid);
     if (result) {
       const winner = gameGrid[result[0][0]][result[0][1]];
-      console.log(`Winner is ${winner}`);
+      this.winnerModal.innerHTML =
+        winner === PLAYER_ID ? "You Win!" : "Computer Wins!";
+      this.winnerModal.classList.remove("hidden");
       return true;
-    } else if (this.isTie(gameGrid)) {
-      console.log("Game is Tied");
+    } else if (this.isTie()) {
+      this.winnerModal.innerHTML = "Game is Tied!";
+      this.winnerModal.classList.remove("hidden");
       return true;
     } else {
       return false;
@@ -138,10 +141,10 @@ class TicTacToe {
     return null;
   }
 
-  isTie(gameGrid) {
+  isTie() {
     var tie = false;
-    for (let i = 0; i < gameGrid.length; i++) {
-      tie = gameGrid[i].every(sq => sq !== "");
+    for (let i = 0; i < this.state.gameGrid.length; i++) {
+      tie = this.state.gameGrid[i].every(sq => sq !== "");
       if (!tie) {
         return false;
       }
