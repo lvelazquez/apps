@@ -3,17 +3,20 @@ const COMPUTER_ID = "computer";
 const PLAYER_CLASS_A = "player-color-a";
 const PLAYER_CLASS_B = "player-color-b";
 
-// keeps game score on localStorage
-// choose different
-// game config, keeps score in localStorage
-// score and time
+// TODO
+// iron out layout issues and animate
+// have timer while player thinks, keeps game score and time
+// keeps score in localStorage?
+// jquery selector decorator for document.querySelector $ use regexp to ^.#.test(selector) or createElement?
+// computer needs to be smarter
+// add level of difficulty?
+// game starts, timer starts while player is playing
 class TicTacToe {
   state = {
     gameGrid: [["", "", ""], ["", "", ""], ["", "", ""]],
     playerClass: ""
   };
 
-  // jquery selector decorator for document.querySelector $ use regexp to ^.#.test(selector) or createElement?
   constructor() {
     this.playerClass = PLAYER_CLASS_A;
     this.computerClass = PLAYER_CLASS_B;
@@ -51,8 +54,7 @@ class TicTacToe {
       option.addEventListener("click", e => this.handleInitClick(e.target));
     });
   }
-  // TODO add level of difficulty?
-  // game starts, timer starts while player is playing
+
   reset() {
     [...this.tileList].forEach(tile => {
       tile.classList.remove(this.playerClass);
@@ -79,7 +81,7 @@ class TicTacToe {
       tile.addEventListener("click", e => this.handleTileClick(e.target))
     );
   }
-  // needs to be smarter
+
   computerPlay() {
     const { gameGrid } = this.state;
     for (var i = 0; i < gameGrid.length; i++) {
@@ -119,7 +121,6 @@ class TicTacToe {
   }
 
   getStatus(gameGrid) {
-    // check diagonal
     const middle = gameGrid[1][1];
     if (middle !== "") {
       if (gameGrid[0][0] === middle && middle === gameGrid[2][2]) {

@@ -29,7 +29,10 @@ body {
   padding: 1rem;
   text-align: center;
 }
-
+#container {
+  position: relative;
+  overflow: auto;
+}
 #game-container {
   display: grid;
   grid-template-columns: 33.33% 33.33% 33.33%;
