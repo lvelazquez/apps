@@ -21,6 +21,12 @@ class TicTacToe {
     this.mainContainer = document.getElementById("game-container");
     this.choosePlayerModal = document.getElementById("choose-player-modal");
     this.winnerModal = document.getElementById("winner-modal");
+
+    document.querySelector("#play-again-btn").addEventListener("click", () => {
+      this.winnerModal.classList.add("hidden");
+      this.reset();
+    });
+
     this.choosePlayerList = document.querySelectorAll(
       ".modal .choose-player-list > li"
     );
@@ -48,9 +54,11 @@ class TicTacToe {
   // TODO add level of difficulty?
   // game starts, timer starts while player is playing
   reset() {
-    [...this.tileList].forEach(tile =>
-      tile.removeEventListener("click", e => this.handleTileClick(e.target))
-    );
+    [...this.tileList].forEach(tile => {
+      tile.classList.remove(this.playerClass);
+      tile.classList.remove(this.computerClass);
+      tile.removeEventListener("click", e => this.handleTileClick(e.target));
+    });
     this.choosePlayerModal.classList.remove("hidden");
   }
 
@@ -65,9 +73,7 @@ class TicTacToe {
   handleInitClick(target) {
     this.playerClass = target.getAttribute("class");
     this.computerClass =
-      this.playerClass === this.state.playerClassA
-        ? PLAYER_CLASS_B
-        : PLAYER_CLASS_A;
+      this.playerClass === PLAYER_CLASS_A ? PLAYER_CLASS_B : PLAYER_CLASS_A;
     this.choosePlayerModal.classList.add("hidden");
     [...this.tileList].forEach(tile =>
       tile.addEventListener("click", e => this.handleTileClick(e.target))
@@ -99,12 +105,12 @@ class TicTacToe {
     const result = this.getStatus(gameGrid);
     if (result) {
       const winner = gameGrid[result[0][0]][result[0][1]];
-      this.winnerModal.innerHTML =
+      document.querySelector(".winner-text").innerHTML =
         winner === PLAYER_ID ? "You Win!" : "Computer Wins!";
       this.winnerModal.classList.remove("hidden");
       return true;
     } else if (this.isTie()) {
-      this.winnerModal.innerHTML = "Game is Tied!";
+      document.querySelector(".winner-text").innerHTML = "Game is Tied!";
       this.winnerModal.classList.remove("hidden");
       return true;
     } else {
