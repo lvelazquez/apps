@@ -27,6 +27,7 @@ class TicTacToe {
 
     document.querySelector("#play-again-btn").addEventListener("click", () => {
       this.winnerModal.classList.add("hidden");
+      this.state.gameGrid = this.state.gameGrid.map(a => a.fill(""));
       this.reset();
     });
 
@@ -36,6 +37,8 @@ class TicTacToe {
 
     this.setup();
     this.reset();
+
+    this.choosePlayerModal.classList.remove("hidden");
   }
 
   setup() {
@@ -61,11 +64,13 @@ class TicTacToe {
       tile.classList.remove(this.computerClass);
       tile.removeEventListener("click", e => this.handleTileClick(e.target));
     });
-    this.choosePlayerModal.classList.remove("hidden");
   }
 
   handleTileClick(target) {
     target.classList.add(this.playerClass);
+    // is there a better way to do this? can we find the position in 2d grid by 0-9
+    // 0 = 0 0, 0 1, 3 = 1, 0
+    // colIndex = childIndex%3 + childIndex
     const pos = target.getAttribute("data-key").split(",");
     this.state.gameGrid[pos[0]][pos[1]] = PLAYER_ID;
     const gameStatus = this.updateStatus();
@@ -120,7 +125,8 @@ class TicTacToe {
     }
   }
 
-  getStatus(gameGrid) {
+  getStatus() {
+    const { gameGrid } = this.state;
     const middle = gameGrid[1][1];
     if (middle !== "") {
       if (gameGrid[0][0] === middle && middle === gameGrid[2][2]) {
