@@ -4,30 +4,26 @@ const PLAYER_CLASS_A = "player-color-a";
 const PLAYER_CLASS_B = "player-color-b";
 
 // TODO
-// iron out layout issues and animate
-// have timer while player thinks, keeps game score and time
-// keeps score in localStorage?
-// jquery selector decorator for document.querySelector $ use regexp to ^.#.test(selector) or createElement?
 // computer needs to be smarter
 // add level of difficulty?
-// game starts, timer starts while player is playing
 class TicTacToe {
   state = {
     gameGrid: [["", "", ""], ["", "", ""], ["", "", ""]],
+    playerScore: 0,
+    computerScore: 0,
     playerClass: ""
   };
 
   constructor() {
     this.playerClass = PLAYER_CLASS_A;
     this.computerClass = PLAYER_CLASS_B;
-
     this.mainContainer = document.getElementById("game-container");
     this.choosePlayerModal = document.getElementById("choose-player-modal");
     this.winnerModal = document.getElementById("winner-modal");
+    this.score = document.getElementById("score");
 
     document.querySelector("#play-again-btn").addEventListener("click", () => {
       this.winnerModal.classList.add("hidden");
-      this.state.gameGrid = this.state.gameGrid.map(a => a.fill(""));
       this.reset();
     });
 
@@ -45,7 +41,7 @@ class TicTacToe {
     this.state.gameGrid.forEach((row, rowIndex) => {
       row.forEach((col, colIndex) => {
         const tile = document.createElement("div");
-        tile.setAttribute("class", "tile");
+        tile.setAttribute("class", "tile fade-color");
         tile.setAttribute("data-key", `${rowIndex},${colIndex}`);
         this.mainContainer.appendChild(tile);
       });
@@ -64,6 +60,7 @@ class TicTacToe {
       tile.classList.remove(this.computerClass);
       tile.removeEventListener("click", e => this.handleTileClick(e.target));
     });
+    this.state.gameGrid = this.state.gameGrid.map(a => a.fill(""));
   }
 
   handleTileClick(target) {
@@ -82,6 +79,7 @@ class TicTacToe {
     this.computerClass =
       this.playerClass === PLAYER_CLASS_A ? PLAYER_CLASS_B : PLAYER_CLASS_A;
     this.choosePlayerModal.classList.add("hidden");
+    this.score.classList.remove("hidden");
     [...this.tileList].forEach(tile =>
       tile.addEventListener("click", e => this.handleTileClick(e.target))
     );
@@ -104,7 +102,7 @@ class TicTacToe {
   }
 
   updateStatus() {
-    const { gameGrid } = this.state;
+    const { gameGrid, playerScore, computerScore } = this.state;
     const playMoves = document.querySelectorAll(
       `#game-container .${this.playerClass}`
     ).length;
@@ -114,6 +112,17 @@ class TicTacToe {
       const winner = gameGrid[result[0][0]][result[0][1]];
       document.querySelector(".winner-text").innerHTML =
         winner === PLAYER_ID ? "You Win!" : "Computer Wins!";
+      if (winner === PLAYER_ID) {
+        this.state.playerScore = playerScore + 1;
+        document.querySelector(
+          `#score .${this.playerClass}`
+        ).innerHTML = this.state.playerScore;
+      } else {
+        this.state.computerScore = computerScore + 1;
+        document.querySelector(
+          `#score .${this.computerClass}`
+        ).innerHTML = this.state.computerScore;
+      }
       this.winnerModal.classList.remove("hidden");
       return true;
     } else if (playMoves === 6 && this.isTie()) {

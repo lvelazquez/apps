@@ -4,6 +4,7 @@
   --green-color: #0c0;
   --red-color: #c00;
   --blue-color: #00c;
+  --dark-grey: #333;
 }
 
 .hidden {
@@ -23,7 +24,7 @@ body {
 }
 
 .fade-color {
-  transition: background-color 0.5s ease-out;
+  transition: background-color 0.15s ease-out;
 }
 
 .modal {
@@ -34,17 +35,34 @@ body {
   width: 250px;
   height: auto;
   display: block;
-  background: gray;
+  background: var(--dark-grey);
   padding: 1rem;
   text-align: center;
+  color: var(--white-color);
   > p {
     margin-top: 0;
   }
 }
+
 #container {
   position: relative;
-  overflow: auto;
+  font-size: 1rem;
 }
+
+#score {
+  color: var(--white-color);
+  margin-bottom: 0;
+  > ul {
+    padding: 0;
+    text-align: center;
+  }
+  > ul > li {
+    list-style: none;
+    display: inline-block;
+    width: 2rem;
+  }
+}
+
 #game-container {
   display: grid;
   grid-template-columns: 33.33% 33.33% 33.33%;
@@ -70,6 +88,17 @@ body {
       list-style: none;
     }
   }
+}
+
+#play-again-btn {
+  border-radius: 0;
+  border-radius: 0;
+  padding: 0.5rem;
+  border: none;
+  font-weight: bold;
+  font: bold 1rem "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+  sans-serif;
+  cursor: pointer;
 }
 
 .tile {
