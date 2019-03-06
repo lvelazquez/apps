@@ -1,0 +1,10 @@
+#gallery-container {
+  column-count: 4;
+}
+
+.gallery-image {
+  > img {
+    width: 100%;
+    height: 100%;
+  }
+}

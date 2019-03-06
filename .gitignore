@@ -1,3 +1,8 @@
 .DS_Store
-.vscode/
+.vscode
 .idea
+.env
+config/
+**/*.css
+**/*.css.map
+node_modules
