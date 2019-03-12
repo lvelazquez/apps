@@ -1,6 +1,6 @@
 const token = INSTAGRAM_TOKEN,
   userid = "self",
-  num_photos = 10; // how much photos do you want to get
+  num_photos = 20; // how much photos do you want to get
 
 (async () => {
   class GalleryImage {
