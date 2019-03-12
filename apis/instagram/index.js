@@ -1,4 +1,3 @@
-import { INSTAGRAM_TOKEN } from "../../config/";
 const token = INSTAGRAM_TOKEN,
   userid = "self",
   num_photos = 10; // how much photos do you want to get
