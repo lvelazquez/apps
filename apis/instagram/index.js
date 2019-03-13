@@ -13,7 +13,7 @@ const token = INSTAGRAM_TOKEN,
       return this.img_container;
     }
   }
-
+  // click and enlarge in modal?
   const response = await fetch(
     `https://api.instagram.com/v1/users/${userid}/media/recent/?access_token=${token}&count=${num_photos}`
   ).catch(err => {
