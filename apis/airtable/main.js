@@ -11,17 +11,19 @@ class Neolomatic {
     this.render()
   }
 
-  getWordData () {
-    const prevnum = {}
-    const randIndexes = []
-    while (randIndexes.length < this.limit) {
+  getRandomIndex () {
+    const indexes = {}
+    while (Object.keys(indexes).length < this.limit) {
       let currentIndex = Math.floor(Math.random() * this.data.length)
-      if (!prevnum[currentIndex]) {
-        prevnum[currentIndex] = true
-        randIndexes.push(currentIndex)
+      if (!indexes[currentIndex]) {
+        indexes[currentIndex] = true
       }
     }
+    return Object.keys(indexes)
+  }
 
+  getWordData () {
+    const randIndexes = this.getRandomIndex()
     const wordData = randIndexes.map(index => {
       const { id, word } = this.data[index]
       const { meaning, derived, example } = this.prefixData[id]

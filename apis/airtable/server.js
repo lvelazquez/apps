@@ -23,7 +23,6 @@ const getPrefixes = async () => {
             return {
               id: record.get('PrefixId'),
               word: record.get('Prefixes')
-              // uses: record.get('uses')
             }
           })
 
