@@ -46,9 +46,10 @@ const getPrefixData = async () => {
       })
       .eachPage(
         function (records) {
-          const data = records.map(record => {
-            return {
-              prefixId: record.get('PrefixId'),
+          const data = {}
+          records.forEach(record => {
+            const prefixId = record.get('PrefixId')
+            data[prefixId] = {
               meaning: record.get('Meaning'),
               derived: record.get('Derived'),
               example: record.get('Example')

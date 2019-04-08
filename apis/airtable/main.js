@@ -5,8 +5,9 @@ class Neolomatic {
     this.data = data
     this.prefixData = prefixData
     this.limit = limit
-    this.resetBtn = document.getElementById('reset-btn')
-    this.resetBtn.addEventListener('click', () => this.render())
+    document
+      .getElementById('reset-btn')
+      .addEventListener('click', () => this.render())
     this.render()
   }
 
@@ -22,16 +23,13 @@ class Neolomatic {
     }
 
     const wordData = randIndexes.map(index => {
-      const prefix = this.data[index]
-      const prefixData = this.prefixData.find(({ prefixId }) => {
-        return prefixId === prefix.id
-      })
-
+      const { id, word } = this.data[index]
+      const { meaning, derived, example } = this.prefixData[id]
       return {
-        word: prefix.word,
-        meaning: prefixData.meaning,
-        derived: prefixData.derived,
-        example: prefixData.example
+        word,
+        meaning,
+        derived,
+        example
       }
     })
 
@@ -51,14 +49,14 @@ class Neolomatic {
       .map(({ word }) => word)
       .join('')
     document.getElementById('neolog-derived').innerHTML = wordData
-      .map(({ derived }) => derived)
-      .join(' - ')
+      .map(({ derived }) => `<span class="row derived">${derived}</span>`)
+      .join('')
     document.getElementById('neolog-meaning').innerHTML = wordData
-      .map(({ meaning }) => meaning)
-      .join(' - ')
+      .map(({ meaning }) => `<span class="row derived">${meaning}</span>`)
+      .join('')
     document.getElementById('neolog-example').innerHTML = wordData
-      .map(({ example }) => example)
-      .join(' - ')
+      .map(({ example }) => `<span class="row derived">${example}</span>`)
+      .join('')
   }
 }
 
