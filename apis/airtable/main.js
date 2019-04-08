@@ -1,56 +1,71 @@
-// fetch data
-// pick two random items from list
-// display them into
-// write some for display {meainig, }
+// generate a neologism
 
 class Neolomatic {
-  constructor (data = []) {
+  constructor (data = [], prefixData = [], limit = 2) {
     this.data = data
-    this.limit = 2
-    document
-      .getElementById('reset-btn')
-      .addEventListener('click', () => this.update())
-    this.update()
+    this.prefixData = prefixData
+    this.limit = limit
+    this.resetBtn = document.getElementById('reset-btn')
+    this.resetBtn.addEventListener('click', () => this.render())
+    this.render()
   }
 
-  update () {
-    document.getElementById('neolog').innerHTML = this.getNewWord()
-  }
-
-  getRandomIndex () {
-    return Math.floor(Math.random() * this.data.length)
-  }
-
-  getNewWord () {
-    this.prevnum = {}
-    this.randIndex = []
-    let currentIndex
-    while (this.randIndex.length < this.limit) {
-      currentIndex = this.getRandomIndex()
-      if (!this.prevnum[currentIndex]) {
-        this.prevnum[currentIndex] = true
-        this.randIndex.push(currentIndex)
+  getWordData () {
+    const prevnum = {}
+    const randIndexes = []
+    while (randIndexes.length < this.limit) {
+      let currentIndex = Math.floor(Math.random() * this.data.length)
+      if (!prevnum[currentIndex]) {
+        prevnum[currentIndex] = true
+        randIndexes.push(currentIndex)
       }
     }
-    const newWord = this.randIndex.map(index => this.data[index].word).join('')
+
+    const wordData = randIndexes.map(index => {
+      const prefix = this.data[index]
+      const prefixData = this.prefixData.find(({ prefixId }) => {
+        return prefixId === prefix.id
+      })
+
+      return {
+        word: prefix.word,
+        meaning: prefixData.meaning,
+        derived: prefixData.derived,
+        example: prefixData.example
+      }
+    })
+
+    const newWord = wordData.map(({ word }) => word).join('')
+
     if (newWord == this.prevWord) {
-      return this.getNewWord()
+      return this.getWordData()
     } else {
       this.prevWord = newWord
-      return newWord
+      return wordData
     }
   }
-}
-async function init () {
-  // const data = await fetch('/prefixes').json()
-  const data = [
-    { word: 'bar', meaning: 'baz baz baz', uses: 'ghdh' },
-    { word: 'foo', meaning: 'meh meh meh meh', uses: 'dcv' },
-    { word: 'baz', meaning: 'bar bar ehmeh', uses: 'absad' }
-  ]
-  const nl = new Neolomatic(data)
+
+  render () {
+    const wordData = this.getWordData()
+    document.getElementById('neolog').innerHTML = wordData
+      .map(({ word }) => word)
+      .join('')
+    document.getElementById('neolog-derived').innerHTML = wordData
+      .map(({ derived }) => derived)
+      .join(' - ')
+    document.getElementById('neolog-meaning').innerHTML = wordData
+      .map(({ meaning }) => meaning)
+      .join(' - ')
+    document.getElementById('neolog-example').innerHTML = wordData
+      .map(({ example }) => example)
+      .join(' - ')
+  }
 }
 
 window.onload = async function () {
-  init()
+  const prefixes = await (await fetch('/prefixes')).json()
+  const prefixData = await (await fetch('/prefixesData')).json()
+  if (prefixes.success && prefixData.success) {
+    new Neolomatic(prefixes.data, prefixData.data)
+  }
 }

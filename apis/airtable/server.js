@@ -13,21 +13,47 @@ const base = new Airtable({ apiKey: process.env.AIRTABLEKEY || '' }).base(
 
 const getPrefixes = async () => {
   return new Promise((resolve, reject) => {
-    base('Greek')
+    base('Prefixes')
       .select({
         view: 'Grid view'
       })
       .eachPage(
         function (records) {
-          console.log(records)
           const data = records.map(record => {
             return {
-              meaning: record.get('meaning'),
-              word: record.get('word'),
-              uses: record.get('uses')
+              id: record.get('PrefixId'),
+              word: record.get('Prefixes')
+              // uses: record.get('uses')
             }
           })
 
+          resolve(data)
+        },
+        function done (err) {
+          if (err) {
+            reject(err)
+          }
+        }
+      )
+  })
+}
+
+const getPrefixData = async () => {
+  return new Promise((resolve, reject) => {
+    base('PrefixesData')
+      .select({
+        view: 'Grid view'
+      })
+      .eachPage(
+        function (records) {
+          const data = records.map(record => {
+            return {
+              prefixId: record.get('PrefixId'),
+              meaning: record.get('Meaning'),
+              derived: record.get('Derived'),
+              example: record.get('Example')
+            }
+          })
           resolve(data)
         },
         function done (err) {
@@ -46,11 +72,28 @@ app.get('/', function (req, res) {
 
 app.get('/prefixes', async (req, res) => {
   getPrefixes()
-    .then(prefixes => {
+    .then(data => {
       res.status(200).send({
         success: 'true',
         message: 'data retrieved successfully',
-        prefixes
+        data
+      })
+    })
+    .catch(err => {
+      res.status(err.statusCode).send({
+        success: 'false',
+        message: err.message
+      })
+    })
+})
+
+app.get('/prefixesData', async (req, res) => {
+  getPrefixData()
+    .then(data => {
+      res.status(200).send({
+        success: 'true',
+        message: 'data retrieved successfully',
+        data
       })
     })
     .catch(err => {

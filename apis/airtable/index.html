@@ -5,10 +5,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Neologism Generator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+      body {
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 900;
+        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+          "Lucida Sans", Arial, sans-serif;
+      }
+
+      section {
+        text-align: center;
+      }
+      button {
+        border: solid black thin;
+        font-size: 1rem;
+        padding: 0.5rem;
+      }
+    </style>
   </head>
   <body>
-    <div id="neolog">wepa</div>
-    <button id="reset-btn">Reset</button>
+    <section>
+      <h1 id="neolog">loading...</h1>
+      <h2 id="neolog-meaning"></h2>
+      <h3 id="neolog-derived"></h3>
+      <h4 id="neolog-example"></h4>
+      <button id="reset-btn">Reset</button>
+    </section>
   </body>
   <script src="main.js"></script>
 </html>
