@@ -12,14 +12,14 @@ class Neolomatic {
   }
 
   getRandomIndex () {
-    const indexes = {}
-    while (Object.keys(indexes).length < this.limit) {
+    const rand = {}
+    while (Object.keys(rand).length < this.limit) {
       let currentIndex = Math.floor(Math.random() * this.data.length)
-      if (!indexes[currentIndex]) {
-        indexes[currentIndex] = true
+      if (!rand[currentIndex]) {
+        rand[currentIndex] = true
       }
     }
-    return Object.keys(indexes)
+    return Object.keys(rand)
   }
 
   getWordData () {
@@ -66,6 +66,7 @@ window.onload = async function () {
   const prefixes = await (await fetch('/prefixes')).json()
   const prefixData = await (await fetch('/prefixesData')).json()
   if (prefixes.success && prefixData.success) {
+    document.getElementById('neolog-container').classList.remove('loading')
     new Neolomatic(prefixes.data, prefixData.data)
   }
 }
