@@ -5,7 +5,7 @@
   "main": "0",
   "scripts": {
     "test": "test",
-    "start": "tsc -w"
+    "start:noc": "parcel noc/index.html --open"
   },
   "author": "",
   "license": "ISC",
