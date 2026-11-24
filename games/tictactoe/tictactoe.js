@@ -1,178 +1,148 @@
-const PLAYER_ID = "player";
-const COMPUTER_ID = "computer";
-const PLAYER_CLASS_A = "player-color-a";
-const PLAYER_CLASS_B = "player-color-b";
+import {
+  EMPTY, PLAYER, COMPUTER, newBoard, getWinner, isTie, pickComputerMove
+} from './game-logic.js'
 
-// TODO
-// computer needs to be smarter
-// add level of difficulty?
+const CLASS_A = 'player-color-a'
+const CLASS_B = 'player-color-b'
+const COMPUTER_DELAY_MS = 200
+const COLOR_NAME = { [CLASS_A]: 'red', [CLASS_B]: 'blue' }
+
 class TicTacToe {
-  state = {
-    gameGrid: [["", "", ""], ["", "", ""], ["", "", ""]],
-    playerScore: 0,
-    computerScore: 0,
-    playerClass: ""
-  };
+  constructor () {
+    this.board = newBoard()
+    this.scores = { [PLAYER]: 0, [COMPUTER]: 0 }
+    this.classes = { [PLAYER]: CLASS_A, [COMPUTER]: CLASS_B }
+    this.paused = false
+    this.over = true
+    this.timer = null
+    this.computerPending = false
 
-  constructor() {
-    this.playerClass = PLAYER_CLASS_A;
-    this.computerClass = PLAYER_CLASS_B;
-    this.mainContainer = document.getElementById("game-container");
-    this.choosePlayerModal = document.getElementById("choose-player-modal");
-    this.winnerModal = document.getElementById("winner-modal");
-    this.score = document.getElementById("score");
+    this.boardEl = document.getElementById('game-container')
+    this.chooseModal = document.getElementById('choose-player-modal')
+    this.winnerModal = document.getElementById('winner-modal')
+    this.winnerText = document.getElementById('winner-text')
+    this.score = document.getElementById('score')
+    this.pauseBtn = document.getElementById('pause-btn')
+    this.playAgainBtn = document.getElementById('play-again-btn')
 
-    document.querySelector("#play-again-btn").addEventListener("click", () => {
-      this.winnerModal.classList.add("hidden");
-      this.reset();
-    });
+    this.tiles = this.board.map((_, i) => {
+      const tile = document.createElement('button')
+      tile.type = 'button'
+      tile.className = 'tile'
+      tile.setAttribute('role', 'gridcell')
+      tile.dataset.index = i
+      tile.setAttribute('aria-label', this.tileLabel(i))
+      tile.addEventListener('click', () => this.playerMove(i))
+      this.boardEl.appendChild(tile)
+      return tile
+    })
+    this.tiles.forEach(t => { t.disabled = true })
 
-    this.choosePlayerList = document.querySelectorAll(
-      ".modal .choose-player-list > li"
-    );
-
-    this.setup();
-    this.reset();
-
-    this.choosePlayerModal.classList.remove("hidden");
+    this.chooseModal.querySelectorAll('[data-class]').forEach(btn =>
+      btn.addEventListener('click', () => this.choose(btn.dataset.class))
+    )
+    this.playAgainBtn.addEventListener('click', () => this.restart())
+    this.pauseBtn.addEventListener('click', () => this.setPaused(!this.paused))
+    document.addEventListener('keydown', e => {
+      if (e.key === 'p' || e.key === 'P') this.setPaused(!this.paused)
+    })
+    this.chooseModal.querySelector('button').focus()
   }
 
-  setup() {
-    this.state.gameGrid.forEach((row, rowIndex) => {
-      row.forEach((col, colIndex) => {
-        const tile = document.createElement("div");
-        tile.setAttribute("class", "tile fade-color");
-        tile.setAttribute("data-key", `${rowIndex},${colIndex}`);
-        this.mainContainer.appendChild(tile);
-      });
-    });
-
-    this.tileList = document.querySelectorAll(".tile");
-
-    [...this.choosePlayerList].forEach(option => {
-      option.addEventListener("click", e => this.handleInitClick(e.target));
-    });
+  tileLabel (i) {
+    const row = Math.floor(i / 3) + 1
+    const col = (i % 3) + 1
+    const owner = this.board[i]
+    const state = owner === EMPTY ? 'empty' : COLOR_NAME[this.classes[owner]]
+    return `Row ${row}, column ${col}, ${state}`
   }
 
-  reset() {
-    [...this.tileList].forEach(tile => {
-      tile.classList.remove(this.playerClass);
-      tile.classList.remove(this.computerClass);
-      tile.removeEventListener("click", e => this.handleTileClick(e.target));
-    });
-    this.state.gameGrid = this.state.gameGrid.map(a => a.fill(""));
+  choose (cls) {
+    this.classes[PLAYER] = cls
+    this.classes[COMPUTER] = cls === CLASS_A ? CLASS_B : CLASS_A
+    this.chooseModal.classList.add('hidden')
+    this.score.classList.remove('hidden')
+    this.restart()
   }
 
-  handleTileClick(target) {
-    target.classList.add(this.playerClass);
-    // is there a better way to do this? can we find the position in 2d grid by 0-9
-    // 0 = 0 0, 0 1, 3 = 1, 0
-    // colIndex = childIndex%3 + childIndex
-    const pos = target.getAttribute("data-key").split(",");
-    this.state.gameGrid[pos[0]][pos[1]] = PLAYER_ID;
-    const gameStatus = this.updateStatus();
-    if (!gameStatus) setTimeout(this.computerPlay.bind(this), 200);
+  restart () {
+    clearTimeout(this.timer)
+    this.board = newBoard()
+    this.over = false
+    this.computerPending = false
+    this.winnerModal.classList.add('hidden')
+    this.tiles.forEach((tile, i) => {
+      tile.classList.remove(CLASS_A, CLASS_B)
+      tile.setAttribute('aria-label', this.tileLabel(i))
+    })
+    this.syncDisabled()
+    this.tiles[0].focus()
   }
 
-  handleInitClick(target) {
-    this.playerClass = target.getAttribute("class");
-    this.computerClass =
-      this.playerClass === PLAYER_CLASS_A ? PLAYER_CLASS_B : PLAYER_CLASS_A;
-    this.choosePlayerModal.classList.add("hidden");
-    this.score.classList.remove("hidden");
-    [...this.tileList].forEach(tile =>
-      tile.addEventListener("click", e => this.handleTileClick(e.target))
-    );
+  setPaused (paused) {
+    if (this.over && !this.paused) return
+    this.paused = paused
+    this.pauseBtn.setAttribute('aria-pressed', String(paused))
+    this.pauseBtn.textContent = paused ? 'Resume' : 'Pause'
+    this.score.classList.toggle('paused', paused)
+    this.syncDisabled()
+    if (!paused && !this.over && this.computerPending) this.scheduleComputer()
   }
 
-  computerPlay() {
-    const { gameGrid } = this.state;
-    for (var i = 0; i < gameGrid.length; i++) {
-      const colIndex = gameGrid[i].indexOf("");
-      if (colIndex > -1) {
-        gameGrid[i][colIndex] = COMPUTER_ID;
-        this.updateStatus();
-        document
-          .querySelector(`.tile[data-key="${i},${colIndex}"]`)
-          .classList.add(this.computerClass);
-        break;
-      }
+  syncDisabled () {
+    this.tiles.forEach((tile, i) => {
+      tile.disabled = this.over || this.paused || this.board[i] !== EMPTY
+    })
+  }
+
+  mark (i, who) {
+    this.board[i] = who
+    this.tiles[i].classList.add(this.classes[who])
+    this.tiles[i].setAttribute('aria-label', this.tileLabel(i))
+  }
+
+  playerMove (i) {
+    if (this.over || this.paused || this.board[i] !== EMPTY) return
+    this.mark(i, PLAYER)
+    if (!this.checkEnd()) {
+      this.computerPending = true
+      this.syncDisabled()
+      this.scheduleComputer()
     }
-    this.updateStatus();
   }
 
-  updateStatus() {
-    const { gameGrid, playerScore, computerScore } = this.state;
-    const playMoves = document.querySelectorAll(
-      `#game-container .${this.playerClass}`
-    ).length;
-    if (playMoves < 3) return;
-    const result = this.getStatus(gameGrid);
+  scheduleComputer () {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => this.computerMove(), COMPUTER_DELAY_MS)
+  }
+
+  computerMove () {
+    if (this.paused || this.over) return
+    this.computerPending = false
+    const i = pickComputerMove(this.board)
+    if (i !== -1) this.mark(i, COMPUTER)
+    this.checkEnd()
+    this.syncDisabled()
+  }
+
+  checkEnd () {
+    const result = getWinner(this.board)
+    if (!result && !isTie(this.board)) return false
+    this.over = true
     if (result) {
-      const winner = gameGrid[result[0][0]][result[0][1]];
-      document.querySelector(".winner-text").innerHTML =
-        winner === PLAYER_ID ? "You Win!" : "Computer Wins!";
-      if (winner === PLAYER_ID) {
-        this.state.playerScore = playerScore + 1;
-        document.querySelector(
-          `#score .${this.playerClass}`
-        ).innerHTML = this.state.playerScore;
-      } else {
-        this.state.computerScore = computerScore + 1;
-        document.querySelector(
-          `#score .${this.computerClass}`
-        ).innerHTML = this.state.computerScore;
-      }
-      this.winnerModal.classList.remove("hidden");
-      return true;
-    } else if (playMoves === 6 && this.isTie()) {
-      document.querySelector(".winner-text").innerHTML = "Game is Tied!";
-      this.winnerModal.classList.remove("hidden");
-      return true;
+      this.scores[result.winner] += 1
+      document.querySelector(
+        `[data-score="${this.classes[result.winner]}"]`
+      ).textContent = this.scores[result.winner]
+      this.winnerText.textContent = result.winner === PLAYER ? 'You win!' : 'Computer wins!'
     } else {
-      return false;
+      this.winnerText.textContent = 'Game is tied!'
     }
-  }
-
-  getStatus() {
-    const { gameGrid } = this.state;
-    const middle = gameGrid[1][1];
-    if (middle !== "") {
-      if (gameGrid[0][0] === middle && middle === gameGrid[2][2]) {
-        return [[0, 0], [1, 1], [2, 2]];
-      } else if (gameGrid[0][2] === middle && middle === gameGrid[2][0]) {
-        return [[0, 2], [1, 1], [2, 0]];
-      }
-    }
-
-    for (let i = 0; i < 3; i++) {
-      let currentRow = gameGrid[i][0];
-      if (currentRow != "") {
-        if (currentRow === gameGrid[i][1] && currentRow === gameGrid[i][2]) {
-          return [[i, 0], [i, 1], [i, 2]];
-        }
-      }
-      let currentCol = gameGrid[0][i];
-      if (currentCol != "") {
-        if (currentCol === gameGrid[1][i] && currentCol === gameGrid[2][i]) {
-          return [[0, i], [1, i + 1], [2, i + 2]];
-        }
-      }
-    }
-
-    return null;
-  }
-
-  isTie() {
-    var tie = false;
-    for (let i = 0; i < this.state.gameGrid.length; i++) {
-      tie = this.state.gameGrid[i].every(sq => sq !== "");
-      if (!tie) return false;
-    }
-    return tie;
+    this.syncDisabled()
+    this.winnerModal.classList.remove('hidden')
+    this.playAgainBtn.focus()
+    return true
   }
 }
 
-window.onload = function() {
-  tictac = new TicTacToe();
-};
+window.addEventListener('load', () => new TicTacToe())

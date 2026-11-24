@@ -1,0 +1,150 @@
+:root {
+  --color-bg: #ccc;
+  --color-white: #fff;
+  --color-tile: #0a7a0a;
+  --color-tile-hover: #0c900c;
+  --color-player-a: #c00;
+  --color-player-b: #00c;
+  --color-dark: #333;
+  --color-focus: #ffd400;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --board-size: min(400px, 90vmin);
+  --board-gap: 5px;
+  --duration-fade: 0.5s;
+  --duration-tile: 0.15s;
+  --ease-out: ease-out;
+}
+
+body {
+  background-color: var(--color-bg);
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", Arial, sans-serif;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  background: var(--color-dark);
+  padding: var(--space-md);
+  text-align: center;
+  color: var(--color-white);
+  transition: opacity var(--duration-fade) var(--ease-out),
+    visibility var(--duration-fade) var(--ease-out);
+}
+
+.modal > p {
+  margin-top: 0;
+}
+
+#container {
+  position: relative;
+  font-size: 1rem;
+}
+
+#score {
+  text-align: center;
+  transition: opacity var(--duration-fade) var(--ease-out);
+}
+
+#score ul {
+  padding: 0;
+  margin: var(--space-sm) 0;
+}
+
+#score li {
+  list-style: none;
+  display: inline-block;
+  min-width: 2rem;
+  padding: var(--space-xs);
+  color: var(--color-white);
+  font-weight: bold;
+}
+
+#game-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: var(--board-gap);
+  width: var(--board-size);
+  height: var(--board-size);
+  margin: 0 auto;
+}
+
+.choose-player-list {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.swatch {
+  width: 5rem;
+  height: 5rem;
+  border: 2px solid var(--color-white);
+  cursor: pointer;
+}
+
+.tile {
+  padding: 0;
+  border: 0;
+  background-color: var(--color-tile);
+  cursor: pointer;
+  transition: background-color var(--duration-tile) var(--ease-out);
+}
+
+.tile:hover:not(:disabled) {
+  background-color: var(--color-tile-hover);
+}
+
+.tile:disabled {
+  cursor: default;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+#play-again-btn,
+#pause-btn {
+  padding: var(--space-sm);
+  border: none;
+  font: bold 1rem "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  cursor: pointer;
+}
+
+#score.paused ~ #game-container {
+  opacity: 0.5;
+}
+
+.player-color-a { background-color: var(--color-player-a); }
+.player-color-b { background-color: var(--color-player-b); }
+
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  #score,
+  .tile {
+    transition: none;
+  }
+}
