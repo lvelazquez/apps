@@ -1,2 +1,0 @@
-// send images
-// lazy load
