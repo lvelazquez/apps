@@ -1,112 +1,62 @@
 /* eslint-disable no-console */
 require('dotenv').config()
-const express = require('express')
 const path = require('path')
-const process = require('process')
+const express = require('express')
 const Airtable = require('airtable')
 
-require('dotenv').config()
+const DEFAULT_BASE_ID = 'appfUhvHQpgv3ncTU'
+const DEFAULT_PORT = 3000
+const VIEW = 'Grid view'
 
-const base = new Airtable({ apiKey: process.env.AIRTABLEKEY || '' }).base(
-  'appfUhvHQpgv3ncTU'
+if (!process.env.AIRTABLEKEY) {
+  console.error('Missing AIRTABLEKEY. Copy .env.example to .env and set it.')
+  process.exit(1)
+}
+
+const base = new Airtable({ apiKey: process.env.AIRTABLEKEY }).base(
+  process.env.AIRTABLE_BASE_ID || DEFAULT_BASE_ID
 )
 
-const getPrefixes = async () => {
-  return new Promise((resolve, reject) => {
-    base('Prefixes')
-      .select({
-        view: 'Grid view'
-      })
-      .eachPage(
-        function (records) {
-          const data = records.map(record => {
-            return {
-              id: record.get('PrefixId'),
-              word: record.get('Prefixes')
-            }
-          })
+// Fetch every record of a table (all pages) and map each one with `mapRecord`.
+const fetchAll = (table, mapRecord) =>
+  base(table).select({ view: VIEW }).all().then(records => records.map(mapRecord))
 
-          resolve(data)
-        },
-        function done (err) {
-          if (err) {
-            reject(err)
-          }
-        }
-      )
-  })
-}
+const getPrefixes = () =>
+  fetchAll('Prefixes', record => ({
+    id: record.get('PrefixId'),
+    word: record.get('Prefixes')
+  }))
 
 const getPrefixData = async () => {
-  return new Promise((resolve, reject) => {
-    base('PrefixesData')
-      .select({
-        view: 'Grid view'
-      })
-      .eachPage(
-        function (records) {
-          const data = {}
-          records.forEach(record => {
-            const prefixId = record.get('PrefixId')
-            data[prefixId] = {
-              meaning: record.get('Meaning'),
-              derived: record.get('Derived'),
-              example: record.get('Example')
-            }
-          })
-          resolve(data)
-        },
-        function done (err) {
-          if (err) {
-            reject(err)
-          }
-        }
-      )
+  const rows = await fetchAll('PrefixesData', record => ({
+    id: record.get('PrefixId'),
+    meaning: record.get('Meaning'),
+    derived: record.get('Derived'),
+    example: record.get('Example')
+  }))
+  const data = {}
+  rows.forEach(({ id, ...rest }) => {
+    data[id] = rest
   })
+  return data
 }
+
+const respond = loader => async (req, res) => {
+  try {
+    const data = await loader()
+    res.status(200).send({ success: true, message: 'data retrieved successfully', data })
+  } catch (err) {
+    res.status(err.statusCode || 500).send({ success: false, message: err.message })
+  }
+}
+
 const app = express()
-app.use(express.static('.', { root: '/' }))
-app.get('/', function (req, res) {
-  res.sendFile(path.resolve(__dirname, 'index.html'))
-})
+// Serve only this folder (never the working directory).
+app.use(express.static(__dirname))
+app.get('/prefixes', respond(getPrefixes))
+app.get('/prefixesData', respond(getPrefixData))
 
-app.get('/prefixes', async (req, res) => {
-  getPrefixes()
-    .then(data => {
-      res.status(200).send({
-        success: 'true',
-        message: 'data retrieved successfully',
-        data
-      })
-    })
-    .catch(err => {
-      res.status(err.statusCode).send({
-        success: 'false',
-        message: err.message
-      })
-    })
-})
-
-app.get('/prefixesData', async (req, res) => {
-  getPrefixData()
-    .then(data => {
-      res.status(200).send({
-        success: 'true',
-        message: 'data retrieved successfully',
-        data
-      })
-    })
-    .catch(err => {
-      res.status(err.statusCode).send({
-        success: 'false',
-        message: err.message
-      })
-    })
-})
-
-app.get('/data', function () {})
-
-const server = app.listen(process.env.PORT, function () {
-  const { address, port } = server.address()
-  console.log('Running a API server at http://%s:%s', address, port)
+const port = Number(process.env.PORT) || DEFAULT_PORT
+app.listen(port, () => {
+  console.log(`Neolomatic running at http://localhost:${port}`)
 })

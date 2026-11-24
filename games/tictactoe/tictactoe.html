@@ -2,43 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>RGB - Tic Tac Toe</title>
-    <meta name="description" content="Tic Tac Toe" />
+    <meta name="description" content="Tic Tac Toe against the computer" />
     <meta name="author" content="leonardovelazquez.com" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main id="container">
-      <aside
-        id="choose-player-modal"
-        class="choose-player modal fade-in hidden"
-      >
-        <p>Choose color:</p>
-        <ul class="choose-player-list">
-          <li
-            id="player-color-a"
-            name="player-color"
-            class="player-color-a"
-          ></li>
-          <li
-            id="player-color-a"
-            name="player-color"
-            class="player-color-b"
-          ></li>
-        </ul>
-      </aside>
-      <aside id="winner-modal" class="game-over modal fade-in hidden">
-        <p class="winner-text"></p>
-        <button id="play-again-btn">Play again?</button>
-      </aside>
-      <section id="score" class="hidden">
-        <ul>
-          <li class="player-color-a">0</li>
-          <li class="player-color-b">0</li>
-        </ul>
+      <h1 class="visually-hidden">Tic Tac Toe</h1>
+
+      <section id="choose-player-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="choose-title">
+        <p id="choose-title">Choose your color</p>
+        <div class="choose-player-list">
+          <button type="button" class="swatch player-color-a" data-class="player-color-a" aria-label="Red"></button>
+          <button type="button" class="swatch player-color-b" data-class="player-color-b" aria-label="Blue"></button>
+        </div>
       </section>
-      <section id="game-container"></section>
+
+      <section id="winner-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="winner-text">
+        <p id="winner-text" class="winner-text" aria-live="assertive"></p>
+        <button id="play-again-btn" type="button">Play again</button>
+      </section>
+
+      <section id="score" class="hidden" aria-label="Score">
+        <ul>
+          <li class="player-color-a"><span class="visually-hidden">Red score </span><span data-score="player-color-a">0</span></li>
+          <li class="player-color-b"><span class="visually-hidden">Blue score </span><span data-score="player-color-b">0</span></li>
+        </ul>
+        <button id="pause-btn" type="button" aria-pressed="false">Pause</button>
+      </section>
+
+      <section id="game-container" role="grid" aria-label="Game board"></section>
     </main>
-    <script src="./tictactoe.js"></script>
+    <script type="module" src="./tictactoe.js"></script>
   </body>
 </html>

@@ -1,22 +1,25 @@
+// Browser-console snippet (not run by the app). Paste it into the devtools console
+// on the page below to export the CSVs imported into Airtable. Requires the
+// `console.save` helper (e.g. the common devtools console-save snippet).
 // http://users.uoa.gr/~nektar/history/language/greek_latin_derivatives.htm
 
-ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-ID_LENGTH = 8
+const ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+const ID_LENGTH = 8
 
 function generateId () {
-  var rtn = ''
-  for (var i = 0; i < ID_LENGTH; i++) {
+  let rtn = ''
+  for (let i = 0; i < ID_LENGTH; i++) {
     rtn += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length))
   }
   return rtn
 }
 
-csvPrefixes = 'PrefixId,Prefixes\n'
-csvPrefixData = 'PrefixId,Meaning,Derived,Example\n'
+let csvPrefixes = 'PrefixId,Prefixes\n'
+let csvPrefixData = 'PrefixId,Meaning,Derived,Example\n'
 
-it = document.querySelectorAll('tbody > tr').values()
+const it = document.querySelectorAll('tbody > tr').values()
 it.next()
-result = it.next()
+let result = it.next()
 while (!result.done) {
   const prefixDataId = generateId()
   const [prefixData, derived, meaning, example] = result.value.cells
@@ -33,5 +36,3 @@ while (!result.done) {
 // PrefixId, Derived, Meaning, Example
 console.save(csvPrefixes, 'csvPrefixes.csv')
 console.save(csvPrefixData, 'csvPrefixData.csv')
-
-// prefixes, derived

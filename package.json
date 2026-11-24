@@ -1,19 +1,23 @@
 {
   "name": "apps",
   "version": "1.0.0",
-  "description": "app iterations",
-  "main": "0",
+  "description": "Small web apps and experiments: a neologism generator backed by Airtable, and a Tic Tac Toe game.",
   "scripts": {
-    "test": "test"
+    "start:neolomatic": "node apis/airtable/server.js",
+    "start:tictactoe": "serve games/tictactoe",
+    "test": "node --test games/tictactoe/*.test.js"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
-    "airtable": "^0.5.10",
-    "dotenv": "^6.2.0",
-    "express": "^4.16.4",
-    "node-fetch": "^2.3.0",
-    "path": "^0.12.7",
-    "process": "^0.11.10"
+    "airtable": "^0.12.2",
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.8"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
   }
 }

@@ -1,0 +1,67 @@
+:root {
+  --color-bg: #fff;
+  --color-text: #1a1a1a;
+  --color-muted: #555;
+  --color-accent: #0b5cad;
+  --color-accent-text: #fff;
+  --color-error: #b00020;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --duration-fade: 0.3s;
+  --ease-fade: ease-out;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Trebuchet MS", "Lucida Grande", Arial, sans-serif;
+}
+
+#neolog-container {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+  text-align: center;
+  transition: opacity var(--duration-fade) var(--ease-fade);
+}
+
+#neolog-container.loading {
+  opacity: 0.4;
+}
+
+#neolog-meaning,
+#neolog-derived,
+#neolog-example {
+  color: var(--color-muted);
+}
+
+.row {
+  display: block;
+  margin: var(--space-sm) 0;
+}
+
+#reset-btn {
+  padding: var(--space-sm) var(--space-md);
+  border: 0;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+#reset-btn:focus-visible {
+  outline: 3px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+#error {
+  color: var(--color-error);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #neolog-container {
+    transition: none;
+  }
+}

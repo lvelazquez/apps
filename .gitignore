@@ -2,8 +2,5 @@
 .vscode
 .idea
 .env
-config/
-**/*.css
-**/*.css.map
 node_modules
 .history/
